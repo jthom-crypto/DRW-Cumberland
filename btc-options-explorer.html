@@ -44,22 +44,42 @@
     /* Header */
     .site-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      padding-bottom: 2rem;
+      padding-bottom: 1.5rem;
       border-bottom: 0.5px solid var(--border);
       margin-bottom: 2.5rem;
     }
 
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cumberland-logo img {
+      height: 28px;
+      width: auto;
+      display: block;
+    }
+
     .site-name {
       font-family: 'Instrument Serif', serif;
-      font-size: 20px;
-      color: var(--fg);
-      text-decoration: none;
+      font-size: 16px;
+      color: var(--fg2);
+      padding-left: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      padding-top: 4px;
     }
 
     .header-tag {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--fg2);
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -307,14 +327,22 @@
 <div class="page">
 
   <header class="site-header">
-    <span class="site-name">Justin Thom</span>
-    <span class="header-tag">Crypto · Options · Cumberland ARM</span>
+    <div class="header-left">
+      <div class="cumberland-logo">
+        <img src="https://res.cloudinary.com/drw/image/upload/v1660141311/comm-cumberland/logos/cumberland-full-white_mm8s41.svg" alt="Cumberland" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none;font-family:'DM Mono',monospace;font-size:15px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg)">CUMBERLAND</span>
+      </div>
+      <span class="site-name">Justin Thom</span>
+    </div>
+    <div class="header-right">
+      <span class="header-tag">Crypto Relationship Manager</span>
+    </div>
   </header>
 
   <div class="hero">
     <p class="hero-eyebrow">Project 01 — Options analytics</p>
     <h1 class="hero-title">BTC options<br><em>payoff explorer</em></h1>
-    <p class="hero-desc">Interactive payoff diagrams for common crypto derivatives strategies. Adjust strike and premium to model institutional use cases (directional calls, portfolio hedges, and income strategies).</p>
+    <p class="hero-desc">Interactive payoff diagrams for common crypto derivatives strategies. Adjust strike and premium to model institutional use cases — from directional calls to portfolio hedges and income strategies.</p>
   </div>
 
   <div class="strat-row" id="strat-row">
@@ -355,7 +383,7 @@
 
   <footer class="footer">
     <span class="footer-text">Spot: <span id="spot-display" style="color:#f0ede8">fetching...</span> · CoinGecko · For illustrative purposes</span>
-    <a class="footer-link" href="https://github.com/justinthom" target="_blank">github.com/justinthom →</a>
+    <a class="footer-link" href="https://github.com/alexchen" target="_blank">github.com/alexchen →</a>
   </footer>
 
 </div>
