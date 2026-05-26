@@ -335,15 +335,15 @@
       <span class="site-name">Justin Thom</span>
     </div>
     <div class="header-right">
-      <span class="header-tag" style="font-weight:bold">Crypto Associate Relationship Manager</span>
+      <span class="header-tag" style="font-weight:bold">Crypto Relationship Manager</span>
       <span style="font-size:14px;color:var(--fg3);letter-spacing:0.08em;font-style:italic;font-weight:bold">application</span>
     </div>
   </header>
 
   <div class="hero">
     <p class="hero-eyebrow">Project 1 — Options analytics</p>
-    <h1 class="hero-title">BTC options<br><em></em></h1>
-    <p class="hero-desc">Interactive derivatives analytics for common crypto options strategies. Adjust strike and premium to model institutional trading, hedging, and portfolio risk management scenarios.</p>
+    <h1 class="hero-title">BTC options<br><em>payoff explorer</em></h1>
+    <p class="hero-desc">Interactive payoff diagrams for common crypto derivatives strategies. Adjust strike and premium to model institutional use cases — from directional calls to portfolio hedges and income strategies.</p>
   </div>
 
   <div class="strat-row" id="strat-row">
@@ -409,7 +409,6 @@
   // Cache instruments so we don't re-fetch on every strategy switch
   let cachedExpiry = null;
   let cachedInstruments = null;
-  let liveDelta = { call: null, put: null };
 
   async function fetchLiveData() {
     // 1. Fetch spot
@@ -478,13 +477,8 @@
         if (!atm) throw new Error('No ATM ' + optType + ' found');
         const t = await deribitGet('ticker', { instrument_name: atm.instrument_name });
         const usd = Math.round(t.mark_price * SPOT);
-        if (t.greeks && t.greeks.delta !== undefined) {
-          const d = parseFloat(t.greeks.delta);
-          if (optType === 'C') liveDelta.call = d.toFixed(3);
-          if (optType === 'P') liveDelta.put = d.toFixed(3);
-          console.log(optType + ' delta set to:', d.toFixed(3));
-        }
         return { usd, name: atm.instrument_name };
+      }
 
       let premiumUSD, label;
 
@@ -521,7 +515,7 @@
         { lbl: 'Max loss', val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
         { lbl: 'Max gain', val: 'Unlimited', sub: 'above breakeven', cls: 'up' },
         { lbl: 'Breakeven', val: '$' + (K + P).toLocaleString(), sub: 'at expiry', cls: '' },
-        { lbl: 'Delta', val: liveDelta.put !== null ? liveDelta.put : '—', sub: liveDelta.put !== null ? 'live · Deribit' : 'loading...', cls: '' },
+        { lbl: 'Delta ~', val: '0.50', sub: 'ATM estimate', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => Math.max(0, s - K) - P),
       color: '#378add',
@@ -533,7 +527,7 @@
         { lbl: 'Max loss', val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
         { lbl: 'Max gain', val: '$' + (K - P).toLocaleString(), sub: 'if BTC → 0', cls: 'up' },
         { lbl: 'Breakeven', val: '$' + (K - P).toLocaleString(), sub: 'at expiry', cls: '' },
-        { lbl: 'Delta', val: liveDelta.call !== null ? liveDelta.call : '—', sub: liveDelta.call !== null ? 'live · Deribit' : 'loading...', cls: '' },
+        { lbl: 'Delta ~', val: '-0.50', sub: 'ATM estimate', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => Math.max(0, K - s) - P),
       color: '#e05555',
@@ -545,19 +539,19 @@
         { lbl: 'Max gain', val: '$' + (K - SPOT + P).toLocaleString(), sub: 'capped at strike', cls: 'up' },
         { lbl: 'Income', val: '$' + P.toLocaleString(), sub: 'premium collected', cls: 'up' },
         { lbl: 'Breakeven', val: '$' + (SPOT - P).toLocaleString(), sub: 'downside buffer', cls: '' },
-        { lbl: 'Delta', val: liveDelta.call !== null ? '-' + liveDelta.call : '—', sub: liveDelta.call !== null ? 'short call · Deribit' : 'loading...', cls: '' },
+        { lbl: 'View', val: 'Neutral+', sub: 'income strategy', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => (s - SPOT) - Math.max(0, s - K) + P),
       color: '#00c87a',
     },
     protective_put: {
       label: 'Protective put',
-      desc: '<strong>Protective put</strong> — hold BTC spot and buy a put as portfolio insurance. Limits downside to a defined level regardless of how far BTC falls. Cost = premium paid, which reduces overall return. Hedging structure for institutional holders with significant BTC exposure.',
+      desc: '<strong>Protective put</strong> — hold BTC spot and buy a put as portfolio insurance. Limits downside to a defined level regardless of how far BTC falls. Cost = premium paid, which reduces overall return. Classic hedging structure for institutional holders with significant BTC exposure.',
       metrics: (K, P) => [
         { lbl: 'Floor loss', val: '-$' + (SPOT - K + P).toLocaleString(), sub: 'max drawdown', cls: 'dn' },
         { lbl: 'Hedge cost', val: '$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
         { lbl: 'Breakeven', val: '$' + (SPOT + P).toLocaleString(), sub: 'at expiry', cls: '' },
-        { lbl: 'Delta', val: liveDelta.put !== null ? liveDelta.put : '—', sub: liveDelta.put !== null ? 'live · Deribit' : 'loading...', cls: '' },
+        { lbl: 'View', val: 'Long hedge', sub: 'holds spot', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => (s - SPOT) + Math.max(0, K - s) - P),
       color: '#378add',
@@ -569,7 +563,7 @@
         { lbl: 'Max loss', val: '-$' + (P * 2).toLocaleString(), sub: 'both premiums', cls: 'dn' },
         { lbl: 'Upper BE', val: '$' + (K + P * 2).toLocaleString(), sub: 'call side', cls: 'up' },
         { lbl: 'Lower BE', val: '$' + (K - P * 2).toLocaleString(), sub: 'put side', cls: 'up' },
-        { lbl: 'Net delta', val: (liveDelta.call !== null && liveDelta.put !== null) ? (parseFloat(liveDelta.call) + parseFloat(liveDelta.put)).toFixed(3) : '—', sub: (liveDelta.call !== null && liveDelta.put !== null) ? 'live · Deribit' : 'loading...', cls: '' },
+        { lbl: 'View', val: 'High vol', sub: 'direction neutral', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => Math.max(0, s - K) + Math.max(0, K - s) - P * 2),
       color: '#8b7fdd',
