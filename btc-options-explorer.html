@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTC Options Payoff Explorer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --bg2: #141414;
+      --bg3: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --fg: #f0ede8;
+      --fg2: #888580;
+      --fg3: #555250;
+      --accent: #00d4a0;
+      --up: #00c87a;
+      --dn: #e05555;
+      --blue: #378add;
+      --purple: #8b7fdd;
+      --amber: #f5a623;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    /* Header */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 2rem;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .site-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 20px;
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    .header-tag {
+      font-size: 11px;
+      color: var(--fg2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Hero */
+    .hero {
+      margin-bottom: 2rem;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 36px;
+      line-height: 1.1;
+      color: var(--fg);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title em { font-style: italic; color: var(--fg2); }
+
+    .hero-desc {
+      font-size: 12px;
+      color: var(--fg2);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* Strategy pills */
+    .strat-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .sp {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 0.5px solid var(--border2);
+      background: transparent;
+      color: var(--fg2);
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: all 0.15s;
+    }
+
+    .sp:hover { border-color: var(--accent); color: var(--accent); }
+    .sp.active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+    /* Metrics */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 600px) { .metrics { grid-template-columns: 1fr 1fr; } }
+
+    .metric {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .metric-label {
+      font-size: 10px;
+      color: var(--fg3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .metric-val {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--fg);
+      margin-bottom: 3px;
+    }
+
+    .metric-sub { font-size: 10px; color: var(--fg2); }
+    .up { color: var(--up); }
+    .dn { color: var(--dn); }
+
+    /* Chart card */
+    .chart-card {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+    }
+
+    .chart-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+      letter-spacing: 0.03em;
+    }
+
+    .chart-sub { font-size: 11px; color: var(--fg2); }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .leg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--fg2);
+    }
+
+    .leg-sq {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* Controls */
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 500px) { .controls { grid-template-columns: 1fr; } }
+
+    .ctrl {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ctrl-label {
+      font-size: 11px;
+      color: var(--fg2);
+      width: 75px;
+      flex-shrink: 0;
+    }
+
+    .ctrl-val {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg);
+      min-width: 58px;
+      text-align: right;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: var(--border2);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Strategy description */
+    .strat-desc {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-left: 2px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+      font-size: 12px;
+      color: var(--fg2);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .strat-desc strong {
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 0.5px solid var(--border);
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text { font-size: 11px; color: var(--fg3); letter-spacing: 0.06em; }
+
+    .footer-link {
+      font-size: 11px;
+      color: var(--fg2);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-link:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <span class="site-name">Justin Thom</span>
+    <span class="header-tag">Crypto · Options · Cumberland ARM</span>
+  </header>
+
+  <div class="hero">
+    <p class="hero-eyebrow">Project 01 — Options analytics</p>
+    <h1 class="hero-title">BTC options<br><em>payoff explorer</em></h1>
+    <p class="hero-desc">Interactive payoff diagrams for common crypto derivatives strategies. Adjust strike and premium to model institutional use cases (directional calls, portfolio hedges, and income strategies).</p>
+  </div>
+
+  <div class="strat-row" id="strat-row">
+    <button class="sp active" data-strat="long_call">Long call</button>
+    <button class="sp" data-strat="long_put">Long put</button>
+    <button class="sp" data-strat="covered_call">Covered call</button>
+    <button class="sp" data-strat="protective_put">Protective put</button>
+    <button class="sp" data-strat="straddle">Straddle</button>
+  </div>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <span class="chart-title" id="chart-title">Long call — payoff at expiry</span>
+      <span class="chart-sub">BTC · Deribit</span>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div style="position:relative;width:100%;height:260px;">
+      <canvas id="payoffChart" role="img" aria-label="Options payoff diagram showing profit and loss at expiry across BTC price range"></canvas>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <span class="ctrl-label">Strike (K)</span>
+      <input type="range" min="85000" max="120000" step="1000" value="103000" id="strike-sl">
+      <span class="ctrl-val" id="strike-out">$103k</span>
+    </div>
+    <div class="ctrl">
+      <span class="ctrl-label">Premium</span>
+      <input type="range" min="500" max="8000" step="100" value="2500" id="prem-sl">
+      <span class="ctrl-val" id="prem-out">$2,500</span>
+    </div>
+  </div>
+
+  <div class="strat-desc" id="strat-desc"></div>
+
+  <footer class="footer">
+    <span class="footer-text">Spot: <span id="spot-display" style="color:#f0ede8">fetching...</span> · CoinGecko · For illustrative purposes</span>
+    <a class="footer-link" href="https://github.com/justinthom" target="_blank">github.com/justinthom →</a>
+  </footer>
+
+</div>
+
+<script>
+  let SPOT = null;
+  let currentStrat = 'long_call';
+  let chartInst = null;
+
+  async function tryFetch(url, parser) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const price = parser(data);
+    if (!price || isNaN(price) || price < 1000) throw new Error('Bad price: ' + price);
+    return Math.round(price);
+  }
+
+  async function fetchSpot() {
+    const BINANCE_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+    const sources = [
+      {
+        url: 'https://proxy.killcors.com/?url=' + encodeURIComponent(BINANCE_URL),
+        parse: d => parseFloat(d.price),
+        name: 'killcors→Binance'
+      },
+      {
+        url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(BINANCE_URL),
+        parse: d => parseFloat(d.price),
+        name: 'allorigins→Binance'
+      },
+      {
+        url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coinbase.com/v2/prices/BTC-USD/spot'),
+        parse: d => parseFloat(d.data.amount),
+        name: 'allorigins→Coinbase'
+      },
+    ];
+
+    for (const src of sources) {
+      try {
+        SPOT = await tryFetch(src.url, src.parse);
+        console.log('BTC spot from ' + src.name + ': $' + SPOT);
+        break;
+      } catch (e) {
+        console.warn(src.name + ' failed:', e.message);
+      }
+    }
+
+    if (!SPOT) {
+      document.getElementById('spot-display').textContent = 'unavailable';
+      SPOT = 77000;
+    }
+    const strike = document.getElementById('strike-sl');
+    const rounded = Math.round(SPOT / 1000) * 1000;
+    strike.min = Math.round(SPOT * 0.80 / 1000) * 1000;
+    strike.max = Math.round(SPOT * 1.20 / 1000) * 1000;
+    strike.value = rounded;
+    document.getElementById('strike-out').textContent = '$' + (rounded / 1000).toFixed(0) + 'k';
+    document.getElementById('spot-display').textContent = '$' + SPOT.toLocaleString();
+    render();
+  }
+
+  const STRATS = {
+    long_call: {
+      label: 'Long call',
+      desc: '<strong>Long call</strong> — right to buy BTC at the strike price on expiry. Bullish view with defined downside. Max loss = premium paid. Unlimited upside above breakeven. Common institutional use: leveraged upside exposure without full spot capital commitment.',
+      metrics: (K, P) => [
+        { lbl: 'Max loss', val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
+        { lbl: 'Max gain', val: 'Unlimited', sub: 'above breakeven', cls: 'up' },
+        { lbl: 'Breakeven', val: '$' + (K + P).toLocaleString(), sub: 'at expiry', cls: '' },
+        { lbl: 'Delta ~', val: '0.50', sub: 'ATM estimate', cls: '' },
+      ],
+      payoff: (prices, K, P) => prices.map(s => Math.max(0, s - K) - P),
+      color: '#378add',
+    },
+    long_put: {
+      label: 'Long put',
+      desc: '<strong>Long put</strong> — right to sell BTC at the strike price. Bearish or hedging view. Max loss = premium. Profit increases as BTC falls below breakeven. Commonly used by spot holders as downside insurance ahead of macro events.',
+      metrics: (K, P) => [
+        { lbl: 'Max loss', val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
+        { lbl: 'Max gain', val: '$' + (K - P).toLocaleString(), sub: 'if BTC → 0', cls: 'up' },
+        { lbl: 'Breakeven', val: '$' + (K - P).toLocaleString(), sub: 'at expiry', cls: '' },
+        { lbl: 'Delta ~', val: '-0.50', sub: 'ATM estimate', cls: '' },
+      ],
+      payoff: (prices, K, P) => prices.map(s => Math.max(0, K - s) - P),
+      color: '#e05555',
+    },
+    covered_call: {
+      label: 'Covered call',
+      desc: '<strong>Covered call</strong> — hold BTC spot, sell a call above current price. Collects premium income and reduces cost basis, but caps upside at the strike. Popular with institutional spot holders seeking yield. Optimal when expecting BTC to trade sideways or drift modestly higher.',
+      metrics: (K, P) => [
+        { lbl: 'Max gain', val: '$' + (K - SPOT + P).toLocaleString(), sub: 'capped at strike', cls: 'up' },
+        { lbl: 'Income', val: '$' + P.toLocaleString(), sub: 'premium collected', cls: 'up' },
+        { lbl: 'Breakeven', val: '$' + (SPOT - P).toLocaleString(), sub: 'downside buffer', cls: '' },
+        { lbl: 'View', val: 'Neutral+', sub: 'income strategy', cls: '' },
+      ],
+      payoff: (prices, K, P) => prices.map(s => (s - SPOT) - Math.max(0, s - K) + P),
+      color: '#00c87a',
+    },
+    protective_put: {
+      label: 'Protective put',
+      desc: '<strong>Protective put</strong> — hold BTC spot and buy a put as portfolio insurance. Limits downside to a defined level regardless of how far BTC falls. Cost = premium paid, which reduces overall return. Classic hedging structure for institutional holders with significant BTC exposure.',
+      metrics: (K, P) => [
+        { lbl: 'Floor loss', val: '-$' + (SPOT - K + P).toLocaleString(), sub: 'max drawdown', cls: 'dn' },
+        { lbl: 'Hedge cost', val: '$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
+        { lbl: 'Breakeven', val: '$' + (SPOT + P).toLocaleString(), sub: 'at expiry', cls: '' },
+        { lbl: 'View', val: 'Long hedge', sub: 'holds spot', cls: '' },
+      ],
+      payoff: (prices, K, P) => prices.map(s => (s - SPOT) + Math.max(0, K - s) - P),
+      color: '#378add',
+    },
+    straddle: {
+      label: 'Straddle',
+      desc: '<strong>Long straddle</strong> — buy both a call and put at the same strike. Profits from large moves in either direction; loses if BTC stays flat near the strike. High-conviction volatility trade, direction-neutral. Popular ahead of binary events: ETF decisions, regulatory rulings, macro data releases.',
+      metrics: (K, P) => [
+        { lbl: 'Max loss', val: '-$' + (P * 2).toLocaleString(), sub: 'both premiums', cls: 'dn' },
+        { lbl: 'Upper BE', val: '$' + (K + P * 2).toLocaleString(), sub: 'call side', cls: 'up' },
+        { lbl: 'Lower BE', val: '$' + (K - P * 2).toLocaleString(), sub: 'put side', cls: 'up' },
+        { lbl: 'View', val: 'High vol', sub: 'direction neutral', cls: '' },
+      ],
+      payoff: (prices, K, P) => prices.map(s => Math.max(0, s - K) + Math.max(0, K - s) - P * 2),
+      color: '#8b7fdd',
+    },
+  };
+
+  function getParams() {
+    return {
+      K: parseInt(document.getElementById('strike-sl').value),
+      P: parseInt(document.getElementById('prem-sl').value),
+    };
+  }
+
+  function update() {
+    const { K, P } = getParams();
+    document.getElementById('strike-out').textContent = '$' + (K / 1000).toFixed(0) + 'k';
+    document.getElementById('prem-out').textContent = '$' + P.toLocaleString();
+    render();
+  }
+
+  function setStrat(s) {
+    currentStrat = s;
+    document.querySelectorAll('.sp').forEach(b => {
+      b.classList.toggle('active', b.dataset.strat === s);
+    });
+    render();
+  }
+
+  function render() {
+    if (SPOT === null) return;
+    const { K, P } = getParams();
+    const strat = STRATS[currentStrat];
+
+    document.getElementById('chart-title').textContent = strat.label + ' — payoff at expiry';
+    document.getElementById('strat-desc').innerHTML = strat.desc;
+
+    const mets = strat.metrics(K, P);
+    document.getElementById('metrics').innerHTML = mets.map(m =>
+      `<div class="metric">
+        <div class="metric-label">${m.lbl}</div>
+        <div class="metric-val ${m.cls}">${m.val}</div>
+        <div class="metric-sub">${m.sub}</div>
+      </div>`
+    ).join('');
+
+    document.getElementById('legend').innerHTML = `
+      <span class="leg"><span class="leg-sq" style="background:${strat.color}"></span>P&L at expiry</span>
+      <span class="leg"><span class="leg-sq" style="background:rgba(255,255,255,0.2)"></span>Breakeven</span>
+      <span class="leg"><span class="leg-sq" style="background:#f5a62344;border:0.5px dashed #f5a623"></span>Current spot ~$${(SPOT/1000).toFixed(0)}k</span>
+    `;
+
+    const priceMin = Math.round(SPOT * 0.72 / 1000) * 1000;
+    const priceMax = Math.round(SPOT * 1.30 / 1000) * 1000;
+    const prices = [];
+    for (let p = priceMin; p <= priceMax; p += 1000) prices.push(p);
+    const pnl = strat.payoff(prices, K, P);
+
+    let beVal = null;
+    if (currentStrat === 'long_call') beVal = K + P;
+    else if (currentStrat === 'long_put') beVal = K - P;
+    else if (currentStrat === 'covered_call') beVal = SPOT - P;
+    else if (currentStrat === 'protective_put') beVal = SPOT + P;
+
+    const ctx = document.getElementById('payoffChart').getContext('2d');
+    if (chartInst) chartInst.destroy();
+
+    const datasets = [
+      {
+        label: 'P&L',
+        data: pnl,
+        borderColor: strat.color,
+        borderWidth: 2.5,
+        pointRadius: 0,
+        fill: { target: { value: 0 }, above: strat.color + '28', below: '#e0555522' },
+        tension: 0.1,
+      },
+      {
+        label: 'Zero',
+        data: prices.map(() => 0),
+        borderColor: 'rgba(255,255,255,0.12)',
+        borderWidth: 1,
+        pointRadius: 0,
+        fill: false,
+        borderDash: [3, 3],
+      },
+    ];
+
+    if (beVal !== null) {
+      datasets.push({
+        label: 'Breakeven',
+        data: prices.map(() => beVal !== null ? pnl[prices.findIndex(p => Math.abs(p - beVal) < 600)] ?? 0 : null),
+        borderColor: 'transparent',
+        pointRadius: prices.map(p => Math.abs(p - beVal) < 600 ? 6 : 0),
+        pointBackgroundColor: 'rgba(255,255,255,0.6)',
+        fill: false,
+      });
+    }
+
+    if (currentStrat === 'straddle') {
+      const upperBE = K + P * 2;
+      const lowerBE = K - P * 2;
+      datasets.push({
+        label: 'Upper BE',
+        data: prices.map(p => Math.abs(p - upperBE) < 600 ? pnl[prices.findIndex(x => Math.abs(x - upperBE) < 600)] ?? 0 : null),
+        borderColor: 'transparent',
+        pointRadius: prices.map(p => Math.abs(p - upperBE) < 600 ? 6 : 0),
+        pointBackgroundColor: 'rgba(255,255,255,0.6)',
+        fill: false,
+      });
+    }
+
+    chartInst = new Chart(ctx, {
+      type: 'line',
+      data: { labels: prices.map(p => '$' + (p / 1000).toFixed(0) + 'k'), datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.datasetIndex === 0
+                ? 'P&L: ' + (ctx.parsed.y >= 0 ? '+' : '') + '$' + Math.round(ctx.parsed.y).toLocaleString()
+                : null,
+              filter: item => item.datasetIndex === 0,
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              font: { family: "'DM Mono', monospace", size: 10 },
+              color: '#555250',
+              maxTicksLimit: 9,
+              maxRotation: 0,
+            },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            border: { color: 'rgba(255,255,255,0.08)' },
+          },
+          y: {
+            ticks: {
+              font: { family: "'DM Mono', monospace", size: 10 },
+              color: '#555250',
+              callback: v => (v >= 0 ? '+' : '') + '$' + (Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + 'k' : Math.round(v)),
+            },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            border: { color: 'rgba(255,255,255,0.08)' },
+          }
+        }
+      }
+    });
+  }
+
+  document.querySelectorAll('.sp').forEach(btn => {
+    btn.addEventListener('click', () => setStrat(btn.dataset.strat));
+  });
+
+  document.getElementById('strike-sl').addEventListener('input', update);
+  document.getElementById('prem-sl').addEventListener('input', update);
+
+  fetchSpot();
+</script>
+</body>
+</html>
