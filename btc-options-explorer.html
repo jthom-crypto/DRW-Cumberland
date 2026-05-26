@@ -9,317 +9,57 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0d0d0d;
-      --bg2: #141414;
-      --bg3: #1a1a1a;
-      --border: rgba(255,255,255,0.08);
-      --border2: rgba(255,255,255,0.14);
-      --fg: #f0ede8;
-      --fg2: #888580;
-      --fg3: #555250;
-      --accent: #00d4a0;
-      --up: #00c87a;
-      --dn: #e05555;
-      --blue: #378add;
-      --purple: #8b7fdd;
-      --amber: #f5a623;
+      --bg: #0d0d0d; --bg2: #141414; --bg3: #1a1a1a;
+      --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+      --fg: #f0ede8; --fg2: #888580; --fg3: #555250;
+      --accent: #00d4a0; --up: #00c87a; --dn: #e05555;
+      --blue: #378add; --purple: #8b7fdd; --amber: #f5a623;
     }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      min-height: 100vh;
-      padding: 0;
-    }
-
-    .page {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem 4rem;
-    }
-
-    /* Header */
-    .site-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding-bottom: 1.5rem;
-      border-bottom: 0.5px solid var(--border);
-      margin-bottom: 2.5rem;
-    }
-
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cumberland-logo img {
-      height: 28px;
-      width: auto;
-      display: block;
-    }
-
-    .site-name {
-      font-family: 'Instrument Serif', serif;
-      font-size: 24px;
-      color: var(--fg2);
-      padding-left: 1px;
-    }
-
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      padding-top: 4px;
-    }
-
-    .header-tag {
-      font-size: 10px;
-      color: var(--fg2);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* Hero */
-    .hero {
-      margin-bottom: 2rem;
-    }
-
-    .hero-eyebrow {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .hero-title {
-      font-family: 'Instrument Serif', serif;
-      font-size: 36px;
-      line-height: 1.1;
-      color: var(--fg);
-      margin-bottom: 0.75rem;
-    }
-
+    body { background: var(--bg); color: var(--fg); font-family: "DM Mono", monospace; min-height: 100vh; padding: 0; }
+    .page { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+    .site-header { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: 1.5rem; border-bottom: 0.5px solid var(--border); margin-bottom: 2.5rem; }
+    .header-left { display: flex; flex-direction: column; gap: 8px; }
+    .cumberland-logo img { height: 28px; width: auto; display: block; }
+    .site-name { font-family: "Instrument Serif", serif; font-size: 24px; color: var(--fg2); padding-left: 1px; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 4px; }
+    .header-tag { font-size: 10px; color: var(--fg2); letter-spacing: 0.1em; text-transform: uppercase; }
+    .hero { margin-bottom: 2rem; }
+    .hero-eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    .hero-title { font-family: "Instrument Serif", serif; font-size: 36px; line-height: 1.1; color: var(--fg); margin-bottom: 0.75rem; }
     .hero-title em { font-style: italic; color: var(--fg2); }
-
-    .hero-desc {
-      font-size: 12px;
-      color: var(--fg2);
-      line-height: 1.7;
-      max-width: 560px;
-    }
-
-    /* Strategy pills */
-    .strat-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-    }
-
-    .sp {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      padding: 6px 14px;
-      border-radius: 100px;
-      border: 0.5px solid var(--border2);
-      background: transparent;
-      color: var(--fg2);
-      cursor: pointer;
-      letter-spacing: 0.04em;
-      transition: all 0.15s;
-    }
-
+    .hero-desc { font-size: 12px; color: var(--fg2); line-height: 1.7; max-width: 560px; }
+    .strat-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .sp { font-family: "DM Mono", monospace; font-size: 11px; padding: 6px 14px; border-radius: 100px; border: 0.5px solid var(--border2); background: transparent; color: var(--fg2); cursor: pointer; letter-spacing: 0.04em; transition: all 0.15s; }
     .sp:hover { border-color: var(--accent); color: var(--accent); }
     .sp.active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-
-    /* Metrics */
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 1.25rem;
-    }
-
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.25rem; }
     @media (max-width: 600px) { .metrics { grid-template-columns: 1fr 1fr; } }
-
-    .metric {
-      background: var(--bg2);
-      border: 0.5px solid var(--border);
-      border-radius: 10px;
-      padding: 0.85rem 1rem;
-    }
-
-    .metric-label {
-      font-size: 10px;
-      color: var(--fg3);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 5px;
-    }
-
-    .metric-val {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--fg);
-      margin-bottom: 3px;
-    }
-
+    .metric { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; }
+    .metric-label { font-size: 10px; color: var(--fg3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+    .metric-val { font-size: 18px; font-weight: 500; color: var(--fg); margin-bottom: 3px; }
     .metric-sub { font-size: 10px; color: var(--fg2); }
-    .up { color: var(--up); }
-    .dn { color: var(--dn); }
-
-    /* Chart card */
-    .chart-card {
-      background: var(--bg2);
-      border: 0.5px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.75rem;
-    }
-
-    .chart-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--fg);
-      letter-spacing: 0.03em;
-    }
-
+    .up { color: var(--up); } .dn { color: var(--dn); }
+    .chart-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+    .chart-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; }
+    .chart-title { font-size: 13px; font-weight: 500; color: var(--fg); letter-spacing: 0.03em; }
     .chart-sub { font-size: 11px; color: var(--fg2); }
-
-    .legend {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .leg {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--fg2);
-    }
-
-    .leg-sq {
-      width: 20px;
-      height: 3px;
-      border-radius: 2px;
-    }
-
-    /* Controls */
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 1.25rem;
-    }
-
+    .legend { display: flex; gap: 18px; margin-bottom: 12px; flex-wrap: wrap; }
+    .leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fg2); }
+    .leg-sq { width: 20px; height: 3px; border-radius: 2px; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
     @media (max-width: 500px) { .controls { grid-template-columns: 1fr; } }
-
-    .ctrl {
-      background: var(--bg2);
-      border: 0.5px solid var(--border);
-      border-radius: 10px;
-      padding: 0.85rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .ctrl-label {
-      font-size: 11px;
-      color: var(--fg2);
-      width: 75px;
-      flex-shrink: 0;
-    }
-
-    .ctrl-val {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--fg);
-      min-width: 58px;
-      text-align: right;
-    }
-
-    input[type=range] {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      background: var(--border2);
-      border-radius: 2px;
-      outline: none;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-    }
-
-    input[type=range]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      border: none;
-    }
-
-    /* Strategy description */
-    .strat-desc {
-      background: var(--bg2);
-      border: 0.5px solid var(--border);
-      border-left: 2px solid var(--accent);
-      border-radius: 0 10px 10px 0;
-      padding: 1rem 1.25rem;
-      font-size: 12px;
-      color: var(--fg2);
-      line-height: 1.7;
-      margin-bottom: 2rem;
-    }
-
-    .strat-desc strong {
-      color: var(--fg);
-      font-weight: 500;
-    }
-
-    /* Footer */
-    .footer {
-      border-top: 0.5px solid var(--border);
-      padding-top: 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    .ctrl { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; display: flex; align-items: center; gap: 12px; }
+    .ctrl-label { font-size: 11px; color: var(--fg2); width: 75px; flex-shrink: 0; }
+    .ctrl-val { font-size: 12px; font-weight: 500; color: var(--fg); min-width: 58px; text-align: right; }
+    input[type=range] { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; background: var(--border2); border-radius: 2px; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+    input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: none; }
+    .strat-desc { background: var(--bg2); border: 0.5px solid var(--border); border-left: 2px solid var(--accent); border-radius: 0 10px 10px 0; padding: 1rem 1.25rem; font-size: 12px; color: var(--fg2); line-height: 1.7; margin-bottom: 2rem; }
+    .strat-desc strong { color: var(--fg); font-weight: 500; }
+    .footer { border-top: 0.5px solid var(--border); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
     .footer-text { font-size: 11px; color: var(--fg3); letter-spacing: 0.06em; }
-
-    .footer-link {
-      font-size: 11px;
-      color: var(--fg2);
-      text-decoration: none;
-      letter-spacing: 0.05em;
-    }
-
+    .footer-link { font-size: 11px; color: var(--fg2); text-decoration: none; letter-spacing: 0.05em; }
     .footer-link:hover { color: var(--accent); }
   </style>
 </head>
@@ -335,7 +75,7 @@
       <span class="site-name">Justin Thom</span>
     </div>
     <div class="header-right">
-      <span class="header-tag" style="font-weight:bold">Crypto Relationship Manager</span>
+      <span class="header-tag" style="font-weight:bold">Crypto Associate Relationship Manager</span>
       <span style="font-size:14px;color:var(--fg3);letter-spacing:0.08em;font-style:italic;font-weight:bold">application</span>
     </div>
   </header>
@@ -343,7 +83,7 @@
   <div class="hero">
     <p class="hero-eyebrow">Project 1 — Options analytics</p>
     <h1 class="hero-title">BTC options<br><em>payoff explorer</em></h1>
-    <p class="hero-desc">Interactive payoff diagrams for common crypto derivatives strategies. Adjust strike and premium to model institutional use cases — from directional calls to portfolio hedges and income strategies.</p>
+    <p class="hero-desc">Interactive derivatives analytics for common crypto options strategies. Adjust strike and premium to model institutional trading, hedging, and portfolio risk management scenarios.</p>
   </div>
 
   <div class="strat-row" id="strat-row">
@@ -363,7 +103,7 @@
     </div>
     <div class="legend" id="legend"></div>
     <div style="position:relative;width:100%;height:260px;">
-      <canvas id="payoffChart" role="img" aria-label="Options payoff diagram showing profit and loss at expiry across BTC price range"></canvas>
+      <canvas id="payoffChart" role="img" aria-label="Options payoff diagram"></canvas>
     </div>
   </div>
 
@@ -388,13 +128,13 @@
   </footer>
 
 </div>
-
 <script>
   let SPOT = null;
   let currentStrat = 'long_call';
   let chartInst = null;
-
-  // ── Live data from Deribit public API (no key required, CORS enabled) ──
+  let cachedExpiry = null;
+  let cachedInstruments = null;
+  let liveDelta = { call: null, put: null };
 
   async function deribitGet(method, params) {
     const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
@@ -406,54 +146,59 @@
     return json.result;
   }
 
-  // Cache instruments so we don't re-fetch on every strategy switch
-  let cachedExpiry = null;
-  let cachedInstruments = null;
+  async function getATMPremium(optType) {
+    const opts = cachedInstruments.filter(i => {
+      const parts = i.instrument_name.split('-');
+      return parts[1] === cachedExpiry && parts[3] === optType;
+    });
+    opts.sort((a, b) => Math.abs(a.strike - SPOT) - Math.abs(b.strike - SPOT));
+    const atm = opts[0];
+    if (!atm) throw new Error('No ATM ' + optType + ' found');
+    const t = await deribitGet('ticker', { instrument_name: atm.instrument_name });
+    const usd = Math.round(t.mark_price * SPOT);
+    if (t.greeks && t.greeks.delta !== undefined) {
+      const d = parseFloat(t.greeks.delta);
+      if (optType === 'C') liveDelta.call = d.toFixed(3);
+      if (optType === 'P') liveDelta.put  = d.toFixed(3);
+    }
+    return { usd, name: atm.instrument_name };
+  }
 
   async function fetchLiveData() {
-    // 1. Fetch spot
     try {
       const ticker = await deribitGet('get_index_price', { index_name: 'btc_usd' });
       SPOT = Math.round(ticker.index_price);
       document.getElementById('spot-display').textContent = '$' + SPOT.toLocaleString();
     } catch(e) {
-      console.warn('Deribit spot failed:', e.message);
       SPOT = 77000;
       document.getElementById('spot-display').textContent = 'unavailable';
     }
 
-    // Set strike slider around live spot
     const rounded = Math.round(SPOT / 1000) * 1000;
     const strikeEl = document.getElementById('strike-sl');
-    strikeEl.min  = Math.round(SPOT * 0.80 / 1000) * 1000;
-    strikeEl.max  = Math.round(SPOT * 1.20 / 1000) * 1000;
+    strikeEl.min   = Math.round(SPOT * 0.80 / 1000) * 1000;
+    strikeEl.max   = Math.round(SPOT * 1.20 / 1000) * 1000;
     strikeEl.value = rounded;
     document.getElementById('strike-out').textContent = '$' + (rounded / 1000).toFixed(0) + 'k';
 
-    // 2. Fetch and cache all instruments + find nearest monthly expiry
     try {
       const instruments = await deribitGet('get_instruments', { currency: 'BTC', kind: 'option', expired: 'false' });
       const now = Date.now();
       const week = 7 * 24 * 3600 * 1000;
-      const monthly = instruments.filter(i => {
-        const parts = i.instrument_name.split('-');
-        return parts.length === 4 && parts[1].length === 7;
-      });
+      const monthly = instruments.filter(i => i.instrument_name.split('-').length === 4 && i.instrument_name.split('-')[1].length === 7);
       monthly.sort((a, b) => a.expiration_timestamp - b.expiration_timestamp);
       const target = monthly.find(i => i.expiration_timestamp - now >= week);
-      if (!target) throw new Error('No suitable expiry found');
+      if (!target) throw new Error('No suitable expiry');
       cachedExpiry = target.instrument_name.split('-')[1];
       cachedInstruments = monthly;
     } catch(e) {
-      console.warn('Deribit instruments failed:', e.message);
+      console.warn('Instruments failed:', e.message);
     }
 
-    // 3. Fetch premium for current strategy
     await fetchPremiumForStrat(currentStrat);
     render();
   }
 
-  // Determine whether a strategy needs a call, put, or both
   function stratOptionType(s) {
     if (s === 'long_call' || s === 'covered_call') return 'C';
     if (s === 'long_put'  || s === 'protective_put') return 'P';
@@ -465,25 +210,9 @@
     if (!cachedInstruments || !cachedExpiry || !SPOT) return;
     const type = stratOptionType(s);
     document.getElementById('prem-display').textContent = 'fetching...';
-
     try {
-      async function getATMPremium(optType) {
-        const opts = cachedInstruments.filter(i => {
-          const parts = i.instrument_name.split('-');
-          return parts[1] === cachedExpiry && parts[3] === optType;
-        });
-        opts.sort((a, b) => Math.abs(a.strike - SPOT) - Math.abs(b.strike - SPOT));
-        const atm = opts[0];
-        if (!atm) throw new Error('No ATM ' + optType + ' found');
-        const t = await deribitGet('ticker', { instrument_name: atm.instrument_name });
-        const usd = Math.round(t.mark_price * SPOT);
-        return { usd, name: atm.instrument_name };
-      }
-
       let premiumUSD, label;
-
       if (type === 'both') {
-        // Straddle: fetch both call and put, sum them
         const [c, p] = await Promise.all([getATMPremium('C'), getATMPremium('P')]);
         premiumUSD = c.usd + p.usd;
         label = '$' + premiumUSD.toLocaleString() + ' (call $' + c.usd.toLocaleString() + ' + put $' + p.usd.toLocaleString() + ')';
@@ -492,7 +221,6 @@
         premiumUSD = result.usd;
         label = '$' + premiumUSD.toLocaleString() + ' (' + result.name + ')';
       }
-
       if (premiumUSD > 100) {
         const premEl = document.getElementById('prem-sl');
         premEl.min   = Math.round(premiumUSD * 0.2 / 100) * 100;
@@ -502,7 +230,7 @@
         document.getElementById('prem-display').textContent = label;
       }
     } catch(e) {
-      console.warn('Deribit premium fetch failed:', e.message);
+      console.warn('Premium fetch failed:', e.message);
       document.getElementById('prem-display').textContent = 'unavailable';
     }
   }
@@ -512,10 +240,10 @@
       label: 'Long call',
       desc: '<strong>Long call</strong> — right to buy BTC at the strike price on expiry. Bullish view with defined downside. Max loss = premium paid. Unlimited upside above breakeven. Common institutional use: leveraged upside exposure without full spot capital commitment.',
       metrics: (K, P) => [
-        { lbl: 'Max loss', val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
-        { lbl: 'Max gain', val: 'Unlimited', sub: 'above breakeven', cls: 'up' },
+        { lbl: 'Max loss',  val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
+        { lbl: 'Max gain',  val: 'Unlimited', sub: 'above breakeven', cls: 'up' },
         { lbl: 'Breakeven', val: '$' + (K + P).toLocaleString(), sub: 'at expiry', cls: '' },
-        { lbl: 'Delta ~', val: '0.50', sub: 'ATM estimate', cls: '' },
+        { lbl: 'Delta',     val: liveDelta.call !== null ? liveDelta.call : '—', sub: liveDelta.call !== null ? 'live · Deribit' : 'loading...', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => Math.max(0, s - K) - P),
       color: '#378add',
@@ -524,10 +252,10 @@
       label: 'Long put',
       desc: '<strong>Long put</strong> — right to sell BTC at the strike price. Bearish or hedging view. Max loss = premium. Profit increases as BTC falls below breakeven. Commonly used by spot holders as downside insurance ahead of macro events.',
       metrics: (K, P) => [
-        { lbl: 'Max loss', val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
-        { lbl: 'Max gain', val: '$' + (K - P).toLocaleString(), sub: 'if BTC → 0', cls: 'up' },
+        { lbl: 'Max loss',  val: '-$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
+        { lbl: 'Max gain',  val: '$' + (K - P).toLocaleString(), sub: 'if BTC → 0', cls: 'up' },
         { lbl: 'Breakeven', val: '$' + (K - P).toLocaleString(), sub: 'at expiry', cls: '' },
-        { lbl: 'Delta ~', val: '-0.50', sub: 'ATM estimate', cls: '' },
+        { lbl: 'Delta',     val: liveDelta.put !== null ? liveDelta.put : '—', sub: liveDelta.put !== null ? 'live · Deribit' : 'loading...', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => Math.max(0, K - s) - P),
       color: '#e05555',
@@ -536,10 +264,10 @@
       label: 'Covered call',
       desc: '<strong>Covered call</strong> — hold BTC spot, sell a call above current price. Collects premium income and reduces cost basis, but caps upside at the strike. Popular with institutional spot holders seeking yield. Optimal when expecting BTC to trade sideways or drift modestly higher.',
       metrics: (K, P) => [
-        { lbl: 'Max gain', val: '$' + (K - SPOT + P).toLocaleString(), sub: 'capped at strike', cls: 'up' },
-        { lbl: 'Income', val: '$' + P.toLocaleString(), sub: 'premium collected', cls: 'up' },
+        { lbl: 'Max gain',  val: '$' + (K - SPOT + P).toLocaleString(), sub: 'capped at strike', cls: 'up' },
+        { lbl: 'Income',    val: '$' + P.toLocaleString(), sub: 'premium collected', cls: 'up' },
         { lbl: 'Breakeven', val: '$' + (SPOT - P).toLocaleString(), sub: 'downside buffer', cls: '' },
-        { lbl: 'View', val: 'Neutral+', sub: 'income strategy', cls: '' },
+        { lbl: 'Delta',     val: liveDelta.call !== null ? '-' + liveDelta.call : '—', sub: liveDelta.call !== null ? 'short call · Deribit' : 'loading...', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => (s - SPOT) - Math.max(0, s - K) + P),
       color: '#00c87a',
@@ -550,8 +278,8 @@
       metrics: (K, P) => [
         { lbl: 'Floor loss', val: '-$' + (SPOT - K + P).toLocaleString(), sub: 'max drawdown', cls: 'dn' },
         { lbl: 'Hedge cost', val: '$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
-        { lbl: 'Breakeven', val: '$' + (SPOT + P).toLocaleString(), sub: 'at expiry', cls: '' },
-        { lbl: 'View', val: 'Long hedge', sub: 'holds spot', cls: '' },
+        { lbl: 'Breakeven',  val: '$' + (SPOT + P).toLocaleString(), sub: 'at expiry', cls: '' },
+        { lbl: 'Delta',      val: liveDelta.put !== null ? liveDelta.put : '—', sub: liveDelta.put !== null ? 'live · Deribit' : 'loading...', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => (s - SPOT) + Math.max(0, K - s) - P),
       color: '#378add',
@@ -560,10 +288,10 @@
       label: 'Straddle',
       desc: '<strong>Long straddle</strong> — buy both a call and put at the same strike. Profits from large moves in either direction; loses if BTC stays flat near the strike. High-conviction volatility trade, direction-neutral. Popular ahead of binary events: ETF decisions, regulatory rulings, macro data releases.',
       metrics: (K, P) => [
-        { lbl: 'Max loss', val: '-$' + (P * 2).toLocaleString(), sub: 'both premiums', cls: 'dn' },
-        { lbl: 'Upper BE', val: '$' + (K + P * 2).toLocaleString(), sub: 'call side', cls: 'up' },
-        { lbl: 'Lower BE', val: '$' + (K - P * 2).toLocaleString(), sub: 'put side', cls: 'up' },
-        { lbl: 'View', val: 'High vol', sub: 'direction neutral', cls: '' },
+        { lbl: 'Max loss',  val: '-$' + (P * 2).toLocaleString(), sub: 'both premiums', cls: 'dn' },
+        { lbl: 'Upper BE',  val: '$' + (K + P * 2).toLocaleString(), sub: 'call side', cls: 'up' },
+        { lbl: 'Lower BE',  val: '$' + (K - P * 2).toLocaleString(), sub: 'put side', cls: 'up' },
+        { lbl: 'Net delta', val: (liveDelta.call !== null && liveDelta.put !== null) ? (parseFloat(liveDelta.call) + parseFloat(liveDelta.put)).toFixed(3) : '—', sub: (liveDelta.call !== null && liveDelta.put !== null) ? 'live · Deribit' : 'loading...', cls: '' },
       ],
       payoff: (prices, K, P) => prices.map(s => Math.max(0, s - K) + Math.max(0, K - s) - P * 2),
       color: '#8b7fdd',
@@ -586,9 +314,7 @@
 
   function setStrat(s) {
     currentStrat = s;
-    document.querySelectorAll('.sp').forEach(b => {
-      b.classList.toggle('active', b.dataset.strat === s);
-    });
+    document.querySelectorAll('.sp').forEach(b => b.classList.toggle('active', b.dataset.strat === s));
     fetchPremiumForStrat(s).then(() => render());
   }
 
@@ -602,11 +328,7 @@
 
     const mets = strat.metrics(K, P);
     document.getElementById('metrics').innerHTML = mets.map(m =>
-      `<div class="metric">
-        <div class="metric-label">${m.lbl}</div>
-        <div class="metric-val ${m.cls}">${m.val}</div>
-        <div class="metric-sub">${m.sub}</div>
-      </div>`
+      `<div class="metric"><div class="metric-label">${m.lbl}</div><div class="metric-val ${m.cls}">${m.val}</div><div class="metric-sub">${m.sub}</div></div>`
     ).join('');
 
     document.getElementById('legend').innerHTML = `
@@ -631,96 +353,33 @@
     if (chartInst) chartInst.destroy();
 
     const datasets = [
-      {
-        label: 'P&L',
-        data: pnl,
-        borderColor: strat.color,
-        borderWidth: 2.5,
-        pointRadius: 0,
-        fill: { target: { value: 0 }, above: strat.color + '28', below: '#e0555522' },
-        tension: 0.1,
-      },
-      {
-        label: 'Zero',
-        data: prices.map(() => 0),
-        borderColor: 'rgba(255,255,255,0.12)',
-        borderWidth: 1,
-        pointRadius: 0,
-        fill: false,
-        borderDash: [3, 3],
-      },
+      { label: 'P&L', data: pnl, borderColor: strat.color, borderWidth: 2.5, pointRadius: 0, fill: { target: { value: 0 }, above: strat.color + '28', below: '#e0555522' }, tension: 0.1 },
+      { label: 'Zero', data: prices.map(() => 0), borderColor: 'rgba(255,255,255,0.12)', borderWidth: 1, pointRadius: 0, fill: false, borderDash: [3,3] },
     ];
 
     if (beVal !== null) {
-      datasets.push({
-        label: 'Breakeven',
-        data: prices.map(() => beVal !== null ? pnl[prices.findIndex(p => Math.abs(p - beVal) < 600)] ?? 0 : null),
-        borderColor: 'transparent',
-        pointRadius: prices.map(p => Math.abs(p - beVal) < 600 ? 6 : 0),
-        pointBackgroundColor: 'rgba(255,255,255,0.6)',
-        fill: false,
-      });
+      datasets.push({ label: 'Breakeven', data: prices.map(() => beVal !== null ? pnl[prices.findIndex(p => Math.abs(p - beVal) < 600)] ?? 0 : null), borderColor: 'transparent', pointRadius: prices.map(p => Math.abs(p - beVal) < 600 ? 6 : 0), pointBackgroundColor: 'rgba(255,255,255,0.6)', fill: false });
     }
-
     if (currentStrat === 'straddle') {
       const upperBE = K + P * 2;
-      const lowerBE = K - P * 2;
-      datasets.push({
-        label: 'Upper BE',
-        data: prices.map(p => Math.abs(p - upperBE) < 600 ? pnl[prices.findIndex(x => Math.abs(x - upperBE) < 600)] ?? 0 : null),
-        borderColor: 'transparent',
-        pointRadius: prices.map(p => Math.abs(p - upperBE) < 600 ? 6 : 0),
-        pointBackgroundColor: 'rgba(255,255,255,0.6)',
-        fill: false,
-      });
+      datasets.push({ label: 'Upper BE', data: prices.map(p => Math.abs(p - upperBE) < 600 ? pnl[prices.findIndex(x => Math.abs(x - upperBE) < 600)] ?? 0 : null), borderColor: 'transparent', pointRadius: prices.map(p => Math.abs(p - upperBE) < 600 ? 6 : 0), pointBackgroundColor: 'rgba(255,255,255,0.6)', fill: false });
     }
 
     chartInst = new Chart(ctx, {
       type: 'line',
-      data: { labels: prices.map(p => '$' + (p / 1000).toFixed(0) + 'k'), datasets },
+      data: { labels: prices.map(p => '$' + (p/1000).toFixed(0) + 'k'), datasets },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ctx.datasetIndex === 0
-                ? 'P&L: ' + (ctx.parsed.y >= 0 ? '+' : '') + '$' + Math.round(ctx.parsed.y).toLocaleString()
-                : null,
-              filter: item => item.datasetIndex === 0,
-            }
-          }
-        },
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.datasetIndex === 0 ? 'P&L: ' + (ctx.parsed.y >= 0 ? '+' : '') + '$' + Math.round(ctx.parsed.y).toLocaleString() : null, filter: item => item.datasetIndex === 0 } } },
         scales: {
-          x: {
-            ticks: {
-              font: { family: "'DM Mono', monospace", size: 10 },
-              color: '#555250',
-              maxTicksLimit: 9,
-              maxRotation: 0,
-            },
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            border: { color: 'rgba(255,255,255,0.08)' },
-          },
-          y: {
-            ticks: {
-              font: { family: "'DM Mono', monospace", size: 10 },
-              color: '#555250',
-              callback: v => (v >= 0 ? '+' : '') + '$' + (Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + 'k' : Math.round(v)),
-            },
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            border: { color: 'rgba(255,255,255,0.08)' },
-          }
+          x: { ticks: { font: { family: "'DM Mono', monospace", size: 10 }, color: '#555250', maxTicksLimit: 9, maxRotation: 0 }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'rgba(255,255,255,0.08)' } },
+          y: { ticks: { font: { family: "'DM Mono', monospace", size: 10 }, color: '#555250', callback: v => (v >= 0 ? '+' : '') + '$' + (Math.abs(v) >= 1000 ? (v/1000).toFixed(0) + 'k' : Math.round(v)) }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'rgba(255,255,255,0.08)' } }
         }
       }
     });
   }
 
-  document.querySelectorAll('.sp').forEach(btn => {
-    btn.addEventListener('click', () => setStrat(btn.dataset.strat));
-  });
-
+  document.querySelectorAll('.sp').forEach(btn => btn.addEventListener('click', () => setStrat(btn.dataset.strat)));
   document.getElementById('strike-sl').addEventListener('input', update);
   document.getElementById('prem-sl').addEventListener('input', update);
 
