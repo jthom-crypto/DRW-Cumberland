@@ -343,7 +343,7 @@
   <div class="hero">
     <p class="hero-eyebrow">Project 1 — Options analytics</p>
     <h1 class="hero-title">BTC options<br><em></em></h1>
-    <p class="hero-desc">Interactive payoff diagrams for common crypto derivatives strategies. Adjust strike and premium to model institutional use cases — from directional calls to portfolio hedges and income strategies.</p>
+    <p class="hero-desc">Interactive derivatives analytics for common crypto options strategies. Adjust strike and premium to model institutional trading, hedging, and portfolio risk management scenarios.</p>
   </div>
 
   <div class="strat-row" id="strat-row">
@@ -546,7 +546,7 @@
     },
     protective_put: {
       label: 'Protective put',
-      desc: '<strong>Protective put</strong> — hold BTC spot and buy a put as portfolio insurance. Limits downside to a defined level regardless of how far BTC falls. Cost = premium paid, which reduces overall return. Classic hedging structure for institutional holders with significant BTC exposure.',
+      desc: '<strong>Protective put</strong> — hold BTC spot and buy a put as portfolio insurance. Limits downside to a defined level regardless of how far BTC falls. Cost = premium paid, which reduces overall return. Hedging structure for institutional holders with significant BTC exposure.',
       metrics: (K, P) => [
         { lbl: 'Floor loss', val: '-$' + (SPOT - K + P).toLocaleString(), sub: 'max drawdown', cls: 'dn' },
         { lbl: 'Hedge cost', val: '$' + P.toLocaleString(), sub: 'premium paid', cls: 'dn' },
