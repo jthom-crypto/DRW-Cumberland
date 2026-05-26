@@ -479,7 +479,10 @@
         const t = await deribitGet('ticker', { instrument_name: atm.instrument_name });
         const usd = Math.round(t.mark_price * SPOT);
 const delta = t.greeks ? parseFloat(t.greeks.delta).toFixed(3) : null;
-if (delta !== null) liveDelta[optType === 'C' ? 'call' : 'put'] = delta;
+if (delta !== null) {
+  if (optType === 'C') liveDelta.call = Math.abs(parseFloat(delta)).toFixed(3);
+  else liveDelta.put = '-' + Math.abs(parseFloat(delta)).toFixed(3);
+}
 return { usd, name: atm.instrument_name, delta };
       }
 
