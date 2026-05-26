@@ -405,13 +405,16 @@
     return json.result;
   }
 
+  // Cache instruments so we don't re-fetch on every strategy switch
+  let cachedExpiry = null;
+  let cachedInstruments = null;
+
   async function fetchLiveData() {
+    // 1. Fetch spot
     try {
-      // 1. Fetch BTC index price (spot) from Deribit
       const ticker = await deribitGet('get_index_price', { index_name: 'btc_usd' });
       SPOT = Math.round(ticker.index_price);
       document.getElementById('spot-display').textContent = '$' + SPOT.toLocaleString();
-      console.log('Deribit spot: $' + SPOT);
     } catch(e) {
       console.warn('Deribit spot failed:', e.message);
       SPOT = 77000;
@@ -426,54 +429,81 @@
     strikeEl.value = rounded;
     document.getElementById('strike-out').textContent = '$' + (rounded / 1000).toFixed(0) + 'k';
 
+    // 2. Fetch and cache all instruments + find nearest monthly expiry
     try {
-      // 2. Find the nearest monthly expiry (Deribit uses DDMMMYY format e.g. 27JUN25)
       const instruments = await deribitGet('get_instruments', { currency: 'BTC', kind: 'option', expired: 'false' });
-
-      // Filter to monthly options (expiry name length = 7 like "27JUN25"), nearest expiry >= 7 days out
       const now = Date.now();
       const week = 7 * 24 * 3600 * 1000;
       const monthly = instruments.filter(i => {
         const parts = i.instrument_name.split('-');
-        // format: BTC-27JUN25-100000-C
         return parts.length === 4 && parts[1].length === 7;
       });
-
-      // Sort by expiry timestamp, pick first one >= 7 days away
       monthly.sort((a, b) => a.expiration_timestamp - b.expiration_timestamp);
       const target = monthly.find(i => i.expiration_timestamp - now >= week);
       if (!target) throw new Error('No suitable expiry found');
-
-      const expiry = target.instrument_name.split('-')[1]; // e.g. "27JUN25"
-
-      // 3. Find the ATM call strike closest to spot for that expiry
-      const calls = monthly.filter(i => {
-        const parts = i.instrument_name.split('-');
-        return parts[1] === expiry && parts[3] === 'C';
-      });
-      calls.sort((a, b) => Math.abs(a.strike - SPOT) - Math.abs(b.strike - SPOT));
-      const atmCall = calls[0];
-      if (!atmCall) throw new Error('No ATM call found');
-
-      // 4. Fetch live ticker for that instrument to get mark price
-      const optTicker = await deribitGet('ticker', { instrument_name: atmCall.instrument_name });
-      const markPriceUSD = Math.round(optTicker.mark_price * SPOT); // mark_price is in BTC, convert to USD
-
-      if (markPriceUSD > 100) {
-        const premEl = document.getElementById('prem-sl');
-        premEl.min   = Math.round(markPriceUSD * 0.2 / 100) * 100;
-        premEl.max   = Math.round(markPriceUSD * 4.0 / 100) * 100;
-        premEl.value = markPriceUSD;
-        document.getElementById('prem-out').textContent = '$' + markPriceUSD.toLocaleString();
-        document.getElementById('prem-display').textContent = '$' + markPriceUSD.toLocaleString() + ' (' + atmCall.instrument_name + ')';
-        console.log('Deribit ATM premium: $' + markPriceUSD + ' (' + atmCall.instrument_name + ')');
-      }
+      cachedExpiry = target.instrument_name.split('-')[1];
+      cachedInstruments = monthly;
     } catch(e) {
-      console.warn('Deribit options failed:', e.message);
-      document.getElementById('prem-display').textContent = 'unavailable';
+      console.warn('Deribit instruments failed:', e.message);
     }
 
+    // 3. Fetch premium for current strategy
+    await fetchPremiumForStrat(currentStrat);
     render();
+  }
+
+  // Determine whether a strategy needs a call, put, or both
+  function stratOptionType(s) {
+    if (s === 'long_call' || s === 'covered_call') return 'C';
+    if (s === 'long_put'  || s === 'protective_put') return 'P';
+    if (s === 'straddle') return 'both';
+    return 'C';
+  }
+
+  async function fetchPremiumForStrat(s) {
+    if (!cachedInstruments || !cachedExpiry || !SPOT) return;
+    const type = stratOptionType(s);
+    document.getElementById('prem-display').textContent = 'fetching...';
+
+    try {
+      async function getATMPremium(optType) {
+        const opts = cachedInstruments.filter(i => {
+          const parts = i.instrument_name.split('-');
+          return parts[1] === cachedExpiry && parts[3] === optType;
+        });
+        opts.sort((a, b) => Math.abs(a.strike - SPOT) - Math.abs(b.strike - SPOT));
+        const atm = opts[0];
+        if (!atm) throw new Error('No ATM ' + optType + ' found');
+        const t = await deribitGet('ticker', { instrument_name: atm.instrument_name });
+        const usd = Math.round(t.mark_price * SPOT);
+        return { usd, name: atm.instrument_name };
+      }
+
+      let premiumUSD, label;
+
+      if (type === 'both') {
+        // Straddle: fetch both call and put, sum them
+        const [c, p] = await Promise.all([getATMPremium('C'), getATMPremium('P')]);
+        premiumUSD = c.usd + p.usd;
+        label = '$' + premiumUSD.toLocaleString() + ' (call $' + c.usd.toLocaleString() + ' + put $' + p.usd.toLocaleString() + ')';
+      } else {
+        const result = await getATMPremium(type);
+        premiumUSD = result.usd;
+        label = '$' + premiumUSD.toLocaleString() + ' (' + result.name + ')';
+      }
+
+      if (premiumUSD > 100) {
+        const premEl = document.getElementById('prem-sl');
+        premEl.min   = Math.round(premiumUSD * 0.2 / 100) * 100;
+        premEl.max   = Math.round(premiumUSD * 4.0 / 100) * 100;
+        premEl.value = premiumUSD;
+        document.getElementById('prem-out').textContent = '$' + premiumUSD.toLocaleString();
+        document.getElementById('prem-display').textContent = label;
+      }
+    } catch(e) {
+      console.warn('Deribit premium fetch failed:', e.message);
+      document.getElementById('prem-display').textContent = 'unavailable';
+    }
   }
 
   const STRATS = {
@@ -558,7 +588,7 @@
     document.querySelectorAll('.sp').forEach(b => {
       b.classList.toggle('active', b.dataset.strat === s);
     });
-    render();
+    fetchPremiumForStrat(s).then(() => render());
   }
 
   function render() {
