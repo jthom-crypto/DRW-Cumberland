@@ -480,8 +480,9 @@
         const usd = Math.round(t.mark_price * SPOT);
 const delta = t.greeks ? parseFloat(t.greeks.delta).toFixed(3) : null;
 if (delta !== null) {
-  if (optType === 'C') liveDelta.call = Math.abs(parseFloat(delta)).toFixed(3);
-  else liveDelta.put = '-' + Math.abs(parseFloat(delta)).toFixed(3);
+  const d = parseFloat(delta);
+  liveDelta.call = optType === 'C' ? Math.abs(d).toFixed(3) : liveDelta.call;
+  liveDelta.put  = optType === 'P' ? (d > 0 ? '-' + d.toFixed(3) : d.toFixed(3)) : liveDelta.put;
 }
 return { usd, name: atm.instrument_name, delta };
       }
