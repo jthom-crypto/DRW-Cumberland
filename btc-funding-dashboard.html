@@ -269,7 +269,7 @@
 
   <div class="card">
     <div class="card-header">
-      <span class="card-title">Carry trade calculator</span>
+      <span class="card-title">Delta-Neutral Funding Carry Estimator</span>
       <span class="card-sub">delta-neutral spot-perp basis</span>
     </div>
     <div class="calc-grid">
@@ -286,7 +286,7 @@
         </div>
         <div class="ctrl">
           <span class="ctrl-label">Rate (8h %)</span>
-          <input type="range" min="0.001" max="0.05" step="0.001" value="0.01" id="rate-sl" oninput="updateCalc()">
+          <input type="range" min="0.0001" max="0.05" step="0.0001" value="0.01" id="rate-sl" oninput="updateCalc()">
           <span class="ctrl-val" id="rate-out">0.010%</span>
         </div>
       </div>
@@ -305,6 +305,7 @@
         </div>
       </div>
     </div>
+    <p style="font-size:10px;color:var(--fg3);margin-top:1rem;line-height:1.6;">Assumes static funding rate. Does not account for trading fees, borrow costs, slippage, liquidation risk, or compounding.</p>
   </div>
 
   <footer class="footer">
