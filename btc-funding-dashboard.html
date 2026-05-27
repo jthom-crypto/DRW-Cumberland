@@ -354,7 +354,7 @@ async function fetchBybitRate() {
     const rate = last.interest !== undefined ? parseFloat(last.interest) :
                  last.prev_index_price !== undefined ? 0 : 0;
     console.log('Prev rate fields:', JSON.stringify(last));
-    return rate;
+    return parseFloat(last.interest_8h);
   }
   throw new Error('No history data');
 }
@@ -376,10 +376,13 @@ async function fetchBinanceHistory() {
   const d = await fetchJSON(
     'https://www.deribit.com/api/v2/public/get_funding_rate_history?instrument_name=BTC-PERPETUAL&start_timestamp=' + startTs + '&end_timestamp=' + endTs
   );
-  console.log('History result length:', d.result ? d.result.length : 0, 'first item:', JSON.stringify(d.result ? d.result[0] : null));
+  console.log('History result length:', d.result ? d.result.length : 0);
+  // Filter to every 8th entry and last 90 points (30 days)
+  const filtered = d.result.filter((_, i) => i % 8 === 0).slice(-90);
+  d.result = filtered;
   return d.result.map(e => ({
     time: new Date(e.timestamp),
-    rate: parseFloat(e.interest),
+    rate: parseFloat(e.interest_8h),
   }));
 }
 
