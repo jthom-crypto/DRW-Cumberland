@@ -224,7 +224,7 @@
       <span class="site-name">Justin Thom</span>
     </div>
     <div class="header-right">
-      <span class="header-tag">Crypto Relationship Manager</span>
+      <span class="header-tag">Crypto Associate Relationship Manager</span>
       <span class="header-sub">application</span>
     </div>
   </header>
@@ -237,7 +237,7 @@
   <div class="hero">
     <p class="hero-eyebrow">Project 3 — Market data</p>
     <h1 class="hero-title">BTC perpetual<br><em>funding dashboard</em></h1>
-    <p class="hero-desc">Live 8-hour funding rates across major venues. Tracks the cost of holding BTC perpetual positions — a key input for carry trades, hedging decisions, and counterparty conversations.</p>
+    <p class="hero-desc">Live 8-hour funding rates across major venues. Tracks the cost of holding BTC perpetual positions.</p>
   </div>
 
   <div class="metrics" id="metrics">
@@ -344,19 +344,16 @@ async function fetchBinanceRate() {
 }
 
 async function fetchBybitRate() {
+  // Fetch last 7 days of funding history and compute average
   const end = Date.now();
-  const start = end - 16 * 3600 * 1000;
+  const start = end - 7 * 24 * 3600 * 1000;
   const d = await fetchJSON('https://www.deribit.com/api/v2/public/get_funding_rate_history?instrument_name=BTC-PERPETUAL&start_timestamp=' + start + '&end_timestamp=' + end);
-  console.log('Deribit history sample:', JSON.stringify(d.result ? d.result[0] : d));
   if (d.result && d.result.length > 0) {
-    const last = d.result[d.result.length - 1];
-    // Try both field names
-    const rate = last.interest !== undefined ? parseFloat(last.interest) :
-                 last.prev_index_price !== undefined ? 0 : 0;
-    console.log('Prev rate fields:', JSON.stringify(last));
-    return parseFloat(last.interest_8h);
+    const rates = d.result.map(e => parseFloat(e.interest_8h)).filter(r => !isNaN(r));
+    const avg = rates.reduce((a, b) => a + b, 0) / rates.length;
+    return avg;
   }
-  throw new Error('No history data');
+  throw new Error('No 7D history data');
 }
 
 async function fetchOKXRate() {
@@ -547,7 +544,7 @@ async function loadAll() {
   // Venue table
   const venues = [
     { name: 'Deribit',  rate: binanceRate.status === 'fulfilled' ? binanceRate.value : 0, error: binanceRate.status !== 'fulfilled' },
-    { name: 'Deribit (prev)', rate: bybitRate.status === 'fulfilled' ? bybitRate.value : 0, error: bybitRate.status !== 'fulfilled' },
+    { name: 'Deribit 7D avg', rate: bybitRate.status === 'fulfilled' ? bybitRate.value : 0, error: bybitRate.status !== 'fulfilled' },
     { name: 'OKX',      rate: okxRate.status     === 'fulfilled' ? okxRate.value     : 0, error: okxRate.status     !== 'fulfilled' },
   ];
   renderVenues(venues);
