@@ -344,16 +344,19 @@ async function fetchBinanceRate() {
 }
 
 async function fetchBybitRate() {
-  // Use Deribit historical avg as Bybit proxy since Bybit blocks CORS
-  // Get last 2 funding periods and average them
   const end = Date.now();
   const start = end - 16 * 3600 * 1000;
   const d = await fetchJSON('https://www.deribit.com/api/v2/public/get_funding_rate_history?instrument_name=BTC-PERPETUAL&start_timestamp=' + start + '&end_timestamp=' + end);
+  console.log('Deribit history sample:', JSON.stringify(d.result ? d.result[0] : d));
   if (d.result && d.result.length > 0) {
     const last = d.result[d.result.length - 1];
-    return parseFloat(last.interest) / 100;
+    // Try both field names
+    const rate = last.interest !== undefined ? parseFloat(last.interest) :
+                 last.prev_index_price !== undefined ? 0 : 0;
+    console.log('Prev rate fields:', JSON.stringify(last));
+    return rate;
   }
-  throw new Error('No Bybit data');
+  throw new Error('No history data');
 }
 
 async function fetchOKXRate() {
@@ -373,9 +376,10 @@ async function fetchBinanceHistory() {
   const d = await fetchJSON(
     'https://www.deribit.com/api/v2/public/get_funding_rate_history?instrument_name=BTC-PERPETUAL&start_timestamp=' + startTs + '&end_timestamp=' + endTs
   );
+  console.log('History result length:', d.result ? d.result.length : 0, 'first item:', JSON.stringify(d.result ? d.result[0] : null));
   return d.result.map(e => ({
     time: new Date(e.timestamp),
-    rate: parseFloat(e.interest), // Deribit interest is already the 8h rate as decimal
+    rate: parseFloat(e.interest),
   }));
 }
 
