@@ -310,7 +310,7 @@
   <footer class="footer">
     <span class="footer-text">
       Spot: <span id="footer-spot" style="color:var(--fg2)">—</span> ·
-      Data: Deribit, OKX, Bybit ·
+      Data: Deribit, OKX ·
       <span style="color:var(--accent)">Live</span>
     </span>
     <a class="footer-link" href="https://github.com/jthom-crypto" target="_blank">github.com/jthom-crypto →</a>
@@ -334,19 +334,26 @@ let btcSpot  = null;
 
 // ── Fetch live data ──────────────────────────────────────────
 
-// OKX and Deribit both support CORS natively from browsers - no proxy needed
 async function fetchBinanceRate() {
-  // Route via Deribit perpetual as primary since Binance blocks CORS
-  // Deribit BTC-PERPETUAL funding rate is publicly accessible
-  const d = await fetchJSON('https://www.deribit.com/api/v2/public/get_funding_rate_value?instrument_name=BTC-PERPETUAL&start_timestamp=' + (Date.now() - 8*3600*1000) + '&end_timestamp=' + Date.now());
-  // Returns 8h rate directly
-  return parseFloat(d.result) / 100;
+  // Use Deribit ticker for BTC-PERPETUAL — same endpoint the options explorer uses
+  const d = await fetchJSON('https://www.deribit.com/api/v2/public/ticker?instrument_name=BTC-PERPETUAL');
+  // current_funding is the current 8h rate as a decimal
+  const rate = parseFloat(d.result.current_funding);
+  console.log('Deribit BTC-PERPETUAL current_funding:', rate, 'raw result:', JSON.stringify(d.result).slice(0, 200));
+  return rate;
 }
 
 async function fetchBybitRate() {
-  // Bybit v5 tickers endpoint supports CORS
-  const d = await fetchJSON('https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT');
-  return parseFloat(d.result.list[0].fundingRate);
+  // Use Deribit historical avg as Bybit proxy since Bybit blocks CORS
+  // Get last 2 funding periods and average them
+  const end = Date.now();
+  const start = end - 16 * 3600 * 1000;
+  const d = await fetchJSON('https://www.deribit.com/api/v2/public/get_funding_rate_history?instrument_name=BTC-PERPETUAL&start_timestamp=' + start + '&end_timestamp=' + end);
+  if (d.result && d.result.length > 0) {
+    const last = d.result[d.result.length - 1];
+    return parseFloat(last.interest) / 100;
+  }
+  throw new Error('No Bybit data');
 }
 
 async function fetchOKXRate() {
@@ -368,7 +375,7 @@ async function fetchBinanceHistory() {
   );
   return d.result.map(e => ({
     time: new Date(e.timestamp),
-    rate: parseFloat(e.interest) / 100, // Deribit returns percentage, convert to decimal
+    rate: parseFloat(e.interest), // Deribit interest is already the 8h rate as decimal
   }));
 }
 
@@ -532,9 +539,9 @@ async function loadAll() {
 
   // Venue table
   const venues = [
-    { name: 'Binance', rate: binanceRate.status === 'fulfilled' ? binanceRate.value : 0, error: binanceRate.status !== 'fulfilled' },
-    { name: 'Bybit',   rate: bybitRate.status   === 'fulfilled' ? bybitRate.value   : 0, error: bybitRate.status   !== 'fulfilled' },
-    { name: 'OKX',     rate: okxRate.status     === 'fulfilled' ? okxRate.value     : 0, error: okxRate.status     !== 'fulfilled' },
+    { name: 'Deribit',  rate: binanceRate.status === 'fulfilled' ? binanceRate.value : 0, error: binanceRate.status !== 'fulfilled' },
+    { name: 'Deribit (prev)', rate: bybitRate.status === 'fulfilled' ? bybitRate.value : 0, error: bybitRate.status !== 'fulfilled' },
+    { name: 'OKX',      rate: okxRate.status     === 'fulfilled' ? okxRate.value     : 0, error: okxRate.status     !== 'fulfilled' },
   ];
   renderVenues(venues);
 
